@@ -18,8 +18,8 @@ X = data["v2"]
 y = data["label"]
 
 model = Pipeline([
-    ("tfidf", TfidfVectorizer(stop_words="english")),
-    ("clf", LogisticRegression()),
+    ("tfidf", TfidfVectorizer(stop_words="english", max_df=0.9, min_df=2, ngram_range=(1, 2))),
+    ("clf", LogisticRegression(C=10, class_weight="balanced", max_iter=1000)),
 ])
 model.fit(X, y)
 print("Model trained successfully!")
