@@ -25,6 +25,14 @@ model.fit(X, y)
 print("Model trained successfully!")
 
 
+@app.route("/", methods=["GET"])
+def home():
+    return jsonify({
+        "status": "online",
+        "message": "SMS Spam Predictor API is running. Send POST requests to /predict."
+    })
+
+
 @app.route("/predict", methods=["POST"])
 def predict():
     body = request.get_json(silent=True)
