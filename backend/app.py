@@ -3,7 +3,7 @@ import re
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
+from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 
 app = Flask(__name__)
@@ -12,8 +12,8 @@ CORS(app)
 # 🔥 --- Text Cleaning Function ---
 def clean_text(text):
     text = text.lower()
-    text = re.sub(r'\W', ' ', text)      # remove special chars
-    text = re.sub(r'\s+', ' ', text)     # remove extra spaces
+    text = re.sub(r'\W', ' ', text)
+    text = re.sub(r'\s+', ' ', text)
     return text.strip()
 
 # --- Train model on startup ---
@@ -22,32 +22,26 @@ print("Loading dataset and training model...")
 data = pd.read_csv("spam_sms.csv", usecols=["v1", "v2"])
 data.dropna(inplace=True)
 
-# rename columns (clean)
 data.columns = ["label", "message"]
-
-# map labels
 data["label"] = data["label"].map({"ham": 0, "spam": 1})
 
-# 🔥 apply cleaning
+# 🔥 Clean text
 data["message"] = data["message"].apply(clean_text)
 
 X = data["message"]
 y = data["label"]
 
-# 🔥 Improved Pipeline
+# 🔥 Improved Pipeline (Naive Bayes)
 model = Pipeline([
     ("tfidf", TfidfVectorizer(
         stop_words="english",
         lowercase=True,
-        ngram_range=(1, 2),
-        max_df=0.9,
-        min_df=2,
-        sublinear_tf=True
+        ngram_range=(1, 2),   # important
+        max_df=0.95,
+        min_df=1              # allow more words
     )),
-    ("clf", LogisticRegression(
-        C=5,
-        class_weight="balanced",
-        max_iter=2000
+    ("clf", MultinomialNB(
+        alpha=0.5             # smoothing (tune: 0.1–1)
     )),
 ])
 
@@ -78,7 +72,6 @@ def predict():
     if not text.strip():
         return jsonify({"error": "Message cannot be empty"}), 400
 
-    # 🔥 apply same cleaning to input
     text = clean_text(text)
 
     prediction = int(model.predict([text])[0])

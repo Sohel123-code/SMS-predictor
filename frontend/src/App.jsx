@@ -74,7 +74,7 @@ export default function App() {
     setError(null)
 
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || 'https://sms-predictor-1.onrender.com'
+      const apiUrl = import.meta.env.VITE_API_URL || (import.meta.env.DEV ? 'http://127.0.0.1:5000' : 'https://sms-predictor-1.onrender.com')
       const res = await fetch(`${apiUrl}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -124,7 +124,7 @@ export default function App() {
         <header className="header">
           <div className="header-badge">
             <span className="badge-dot" />
-            Logistic Regression
+            Naive Bayes
           </div>
           <h1>SMS Spam Detector</h1>
           <p>Paste any SMS message below and our machine-learning model will instantly classify it as spam or legitimate.</p>
@@ -290,7 +290,7 @@ export default function App() {
                 <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/>
               </svg>
               <div className="step-title">ML Processing</div>
-              <div className="step-desc">TF-IDF vectorization and Logistic Regression model scores the text.</div>
+              <div className="step-desc">TF-IDF vectorization and Naive Bayes model scores the text.</div>
             </div>
             <div className="step-card">
               <svg className="step-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
